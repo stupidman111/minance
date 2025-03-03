@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+//交易类型：INCOME-收入，EXPENSE-支出
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+//账户类型：CURRENT-活期，SAVINGS-储蓄
+enum AccountType {
+  CURRENT
+  SAVINGS
+}
+
+//交易状态：PENDING-待处理，COMPLETED-已完成，FAILED-失败
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+//交易周期：DAILY-每日，WEEKLY-每周，MONTHLY-每月，YEARLY-每年
+enum RecurringInterval {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+//用户表
+model User {
+  id           String        @id @default(uuid())
+  clerkUserId  String        @unique
+  email        String        @unique
+  name         String?
+  imageUrl     String?
+  transactions Transaction[] //用户的所有交易，一对多关系
+  accounts     Account[] //用户的所有账户，一对多关系
+  budgets      Budget[] //用户的所有预算，一对多关系
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("users")
+}
+
+//账户表
+model Account {
+  id           String        @id @default(uuid())
+  name         String //账户名称
+  type         AccountType //账户类型
+  balance      Decimal       @default(0)
+  isDefault    Boolean       @default(false) //是否默认账户
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade) //账户所属用户，多对一关系
+  transactions Transaction[] //账户的所有交易，一对多关系
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+//交易表
+model Transaction {
+  id                String             @id @default(uuid())
+  type              TransactionType
+  amount            Decimal
+  description       String?
+  date              DateTime
+  category          String
+  receiptUrl        String?
+  isRecurring       Boolean            @default(false)
+  recurringInterval RecurringInterval?
+  nextRecurringDate DateTime? //下一次重复的日期
+  lastProcessed     DateTime? //上一次处理的日期
+  status            TransactionStatus  @default(COMPLETED) //交易状态
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade) //交易所属用户，多对一关系
+  accountId         String
+  account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade) //交易所属账户，多对一关系
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([accountId])
+  @@map("transactions")
+}
+
+//预算表，定时任务会定期检查当前开支是否达到预算的多少百分比，如果达到，则发送警报（邮件提醒）
+model Budget {
+  id            String    @id @default(uuid())
+  amount        Decimal
+  lastAlertSent DateTime? //上次发送警报的日期
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade) //预算所属用户，多对一关系
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("budgets")
+}
