@@ -406,7 +406,13 @@ export default function TransactionTable({ transactions }) {
                     </TableCell>
                     <TableCell className="px-4 py-3.5 font-medium text-slate-900">
                       <div className="flex flex-col">
-                        <span>{format(new Date(transaction.date), "PP")}</span>
+                        {/* 修改后的日期格式 */}
+                        <span>
+                          {format(
+                            new Date(transaction.date),
+                            "yyyy 年 MM 月 dd 日"
+                          )}
+                        </span>
                         <span className="text-xs text-slate-500">
                           {format(new Date(transaction.date), "HH:mm")}
                         </span>
@@ -602,7 +608,7 @@ export default function TransactionTable({ transactions }) {
                 {transaction.description}
               </div>
               <div className="text-xs text-slate-500">
-                {format(new Date(transaction.date), "PP")}{" "}
+                {format(new Date(transaction.date), "yyyy 年 MM 月 dd 日")}{" "}
                 {format(new Date(transaction.date), "HH:mm")}
               </div>
               <div className="flex items-center justify-between">

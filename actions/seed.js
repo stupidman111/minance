@@ -3,37 +3,34 @@
 import { db } from "@/lib/prisma";
 import { subDays } from "date-fns";
 
-const ACCOUNT_ID = "0e06798e-bab6-48b1-8f32-abe9d9f18a3c";
+const ACCOUNT_ID = "62720506-8dff-4b3d-8b05-0c025b873f90";
 const USER_ID = "bc149197-4d18-4bd9-a4ca-b0651d6f759a";
 
 // Categories with their typical amount ranges
 const CATEGORIES = {
   INCOME: [
-    { name: "salary", range: [5000, 8000] },
-    { name: "freelance", range: [1000, 3000] },
-    { name: "investments", range: [500, 2000] },
-    { name: "other-income", range: [100, 1000] },
+    { name: "工资收益", range: [5000, 8000] },
+    { name: "基金收益", range: [1000, 3000] },
   ],
   EXPENSE: [
-    { name: "housing", range: [1000, 2000] },
-    { name: "transportation", range: [100, 500] },
-    { name: "groceries", range: [200, 600] },
-    { name: "utilities", range: [100, 300] },
-    { name: "entertainment", range: [50, 200] },
-    { name: "food", range: [50, 150] },
-    { name: "shopping", range: [100, 500] },
-    { name: "healthcare", range: [100, 1000] },
-    { name: "education", range: [200, 1000] },
-    { name: "travel", range: [500, 2000] },
+    { name: "房租", range: [1000, 2000] },
+    { name: "交通", range: [100, 500] },
+    { name: "通讯", range: [50, 200] },
+    { name: "娱乐", range: [50, 200] },
+    { name: "饮食", range: [50, 150] },
+    { name: "购物", range: [100, 500] },
+    { name: "教育", range: [100, 1000] },
+    { name: "医疗", range: [50, 300] },
+    { name: "旅游", range: [500, 2000] },
   ],
 };
 
-// Helper to generate random amount within a range
+// 在一个范围内生成随机数
 function getRandomAmount(min, max) {
   return Number((Math.random() * (max - min) + min).toFixed(2));
 }
 
-// Helper to get random category with amount
+// 获得随机类别与金额
 function getRandomCategory(type) {
   const categories = CATEGORIES[type];
   const category = categories[Math.floor(Math.random() * categories.length)];
@@ -47,7 +44,7 @@ export async function seedTransactions() {
     const transactions = [];
     let totalBalance = 0;
 
-    for (let i = 90; i >= 0; i--) {
+    for (let i = 10; i >= 0; i--) {
       const date = subDays(new Date(), i);
 
       // Generate 1-3 transactions per day
@@ -62,9 +59,7 @@ export async function seedTransactions() {
           id: crypto.randomUUID(),
           type,
           amount,
-          description: `${
-            type === "INCOME" ? "Received" : "Paid for"
-          } ${category}`,
+          description: `${type === "INCOME" ? "收入：" : "支出："} ${category}`,
           date,
           category,
           status: "COMPLETED",
