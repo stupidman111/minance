@@ -1,4 +1,4 @@
-import { getCurrentBudaget } from "@/actions/budget";
+import { getCurrentBudget } from "@/actions/budget";
 import { getUserAccounts } from "@/actions/dashboard";
 import CreateAccountDrawer from "@/components/create-account-drawer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +13,7 @@ async function DashboardPage() {
 
   let budgetData = null;
   if (defaultAccount) {
-    budgetData = await getCurrentBudaget(defaultAccount.id);
+    budgetData = await getCurrentBudget(defaultAccount.id);
   }
 
   return (
