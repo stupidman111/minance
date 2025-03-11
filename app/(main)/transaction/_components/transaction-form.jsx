@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { ReceiptScanner } from "./recipt-scanner";
 
 const AddTransactionForm = ({
   accounts,
@@ -133,7 +134,7 @@ const AddTransactionForm = ({
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       {/* Receipt Scanner - Only show in create mode */}
-      {/* {!editMode && <ReceiptScanner onScanComplete={handleScanComplete} />} */}
+      {!editMode && <ReceiptScanner onScanComplete={handleScanComplete} />}
 
       {/** Type */}
       <div className="space-y-2">
